@@ -8,13 +8,12 @@ PYTHON_WRAPPER_DIR=python_wrapper
 PYTHON_WRAPPER_FILE=src/python/wrapper/python_wrapper.cc
 PYTHON_PKG_DIR=python_package
 DOC_DIR=doc
-PYTHON_BIN=python
 
 ALL_HEADERS = $(INC_DIR)/core/lsh_table.h $(INC_DIR)/core/cosine_distance.h $(INC_DIR)/core/euclidean_distance.h $(INC_DIR)/core/composite_hash_table.h $(INC_DIR)/core/stl_hash_table.h $(INC_DIR)/core/polytope_hash.h $(INC_DIR)/core/flat_hash_table.h $(INC_DIR)/core/probing_hash_table.h $(INC_DIR)/core/hyperplane_hash.h $(INC_DIR)/core/heap.h $(INC_DIR)/core/prefetchers.h $(INC_DIR)/core/incremental_sorter.h $(INC_DIR)/core/lsh_function_helpers.h $(INC_DIR)/core/hash_table_helpers.h $(INC_DIR)/core/data_storage.h $(INC_DIR)/core/nn_query.h $(INC_DIR)/lsh_nn_table.h $(INC_DIR)/wrapper/cpp_wrapper_impl.h $(INC_DIR)/falconn_global.h $(TEST_DIR)/test_utils.h  $(INC_DIR)/core/data_transformation.h $(INC_DIR)/core/bit_packed_vector.h $(INC_DIR)/core/bit_packed_flat_hash_table.h
 
 CXX=g++
 CXXFLAGS=-std=c++11 -DNDEBUG -Wall -Wextra -Wno-missing-braces -march=native -O3 -I external/eigen -I src/include
-NUMPY_INCLUDE_DIR= $(shell python -c "import numpy; print(numpy.get_include())")
+NUMPY_INCLUDE_DIR= $(shell python3.6 -c "import numpy; print(numpy.get_include())")
 
 clean:
 	rm -rf obj
@@ -31,7 +30,7 @@ docs: $(ALL_HEADERS) $(DOC_DIR)/Doxyfile
 python_wrapper: $(ALL_HEADERS) $(PYTHON_WRAPPER_FILE)
 	rm -rf $(PYTHON_WRAPPER_DIR)
 	mkdir -p $(PYTHON_WRAPPER_DIR)
-	$(CXX) $(CXXFLAGS) -shared -fPIC -I external/pybind11/include `python-config --cflags --ldflags` $(PYTHON_WRAPPER_FILE) -o $(PYTHON_WRAPPER_DIR)/_falconn.so
+	$(CXX) $(CXXFLAGS) -shared -fPIC -I external/pybind11/include `python3.6-config --cflags --ldflags` $(PYTHON_WRAPPER_FILE) -o $(PYTHON_WRAPPER_DIR)/_falconn.so
 
 python_package:
 	rm -rf $(PYTHON_PKG_DIR)
@@ -49,10 +48,10 @@ python_package:
 	mkdir -p $(PYTHON_PKG_DIR)/external
 	cp -r external/eigen $(PYTHON_PKG_DIR)/external
 	cp -r external/pybind11 $(PYTHON_PKG_DIR)/external
-	cd $(PYTHON_PKG_DIR); $(PYTHON_BIN) setup.py sdist; cd dist; tar -xf FALCONN*.tar.gz; cd FALCONN-*; $(PYTHON_BIN) setup.py build
+	cd $(PYTHON_PKG_DIR); python3.6 setup.py sdist; cd dist; tar -xf FALCONN*.tar.gz; cd FALCONN-*; python3.6 setup.py build
 
 python_package_install: python_package
-	cd $(PYTHON_PKG_DIR)/dist/FALCONN-*; $(PYTHON_BIN) setup.py install
+	cd $(PYTHON_PKG_DIR)/dist/FALCONN-*; python3.6 setup.py install
 
 random_benchmark: $(BENCH_DIR)/random_benchmark.cc $(ALL_HEADERS)
 	$(CXX) $(CXXFLAGS) -o $@ $(BENCH_DIR)/random_benchmark.cc -pthread
