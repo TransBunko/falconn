@@ -3,7 +3,7 @@
 *.swn
 obj
 test_bin
-python_pkg
+python_package
 python_swig
 random_benchmark
 test-output.txt
